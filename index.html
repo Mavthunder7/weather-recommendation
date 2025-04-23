@@ -1,25 +1,188 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cooler vs AC Recommendation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #recommendation { font-size: 1.2em; margin-top: 20px; }
+    /* Global Styles */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      margin: 20px 0;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+      letter-spacing: 3px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    p {
+      font-size: 1.3rem;
+      margin: 20px 0;
+      color: rgba(255, 255, 255, 0.8);
+      animation: fadeIn 2.5s ease-in-out;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      font-size: 1.2rem;
+      margin: 20px 0;
+    }
+
+    li {
+      margin: 10px 0;
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    #recommendation {
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 15px 30px;
+      border-radius: 25px;
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.7);
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    /* Green for Cooler */
+    .green {
+      background-color: rgba(40, 167, 69, 0.8);
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+      animation: excitement 2s ease-in-out forwards;
+    }
+
+    /* Yellow for Marginal */
+    .yellow {
+      background-color: rgba(255, 193, 7, 0.8);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+      animation: excitement 2s ease-in-out forwards;
+    }
+
+    /* Red for AC */
+    .red {
+      background-color: rgba(220, 53, 69, 0.8);
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+      animation: sadness 2s ease-in-out forwards;
+    }
+
+    /* Check loading spinner */
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+      margin: 30px 0;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Excitement Animation (Green/Yellow) */
+    @keyframes excitement {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+        text-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.6);
+      }
+    }
+
+    /* Sadness Animation (Red) */
+    @keyframes sadness {
+      0% {
+        transform: scale(0.9);
+        opacity: 0;
+        filter: brightness(0.6);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(0.3);
+      }
+    }
+
+    /* Fade-in effect */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .btn {
+      padding: 12px 25px;
+      font-size: 1.4rem;
+      color: white;
+      background: linear-gradient(45deg, #2193b0, #6dd5ed);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 30px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      background: linear-gradient(45deg, #6dd5ed, #2193b0);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: white;
+      opacity: 0.8;
+    }
+
   </style>
 </head>
 <body>
-  <h1>Cooler vs AC Recommendation</h1>
-  <p>This page will auto-detect your location and check:</p>
+  <h1 class="neon-text">Cooler vs AC Recommendation</h1>
+  <p>Let's find out whether you should use a cooler or an AC!</p>
   <ul>
     <li>Relative Humidity (RH)</li>
     <li>Dew Point (°C) (Calculated)</li>
     <li>Ambient Wind Speed (km/h)</li>
   </ul>
+  <div class="spinner" id="loadingSpinner"></div>
   <div id="recommendation">Fetching weather data…</div>
+  <button class="btn" onclick="reloadWeather()">Check Again</button>
+
+  <footer>
+    <p>Made with ❤️ by <strong>Mavthunder7</strong></p>
+  </footer>
 
   <script>
     const recDiv = document.getElementById('recommendation');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     function calculateDewPoint(tempC, humidity) {
       const a = 17.27;
@@ -41,53 +204,66 @@
         const windStatus = (windKmh >= 7.2) ? 'green' : (windKmh >= 3.6) ? 'yellow' : 'red';
 
         if (rhStatus === 'green' && dewStatus === 'green' && windStatus === 'green') {
-          return '✅ Cooler will work fine';
+          return { rec: '✅ Cooler will work fine', class: 'green' };
         } else if (rhStatus === 'red' || dewStatus === 'red' || windStatus === 'red') {
-          return '❌ Use AC';
+          return { rec: '❌ Use AC', class: 'red' };
         } else {
-          return '⚠️ Performance marginal; consider AC';
+          return { rec: '⚠️ Performance marginal; consider AC', class: 'yellow' };
         }
       } catch (error) {
-        return 'Error processing weather data: ' + error.message;
+        return { rec: 'Error processing weather data: ' + error.message, class: 'red' };
       }
     }
 
     function fetchWeather(lat, lon) {
-  const apiKey = '0fd28e52215d8e37870957e8b3c313f1';
-  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+      const apiKey = '0fd28e52215d8e37870957e8b3c313f1';
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      console.log("Weather data received:", data); // 👈 Add this line
-      if (!data.main || typeof data.main.humidity === 'undefined' || typeof data.main.temp === 'undefined') {
-        recDiv.textContent = 'Error: Incomplete weather data received.';
-        return;
-      }
-      if (!data.wind || typeof data.wind.speed === 'undefined') {
-        recDiv.textContent = 'Error: Incomplete weather data received.';
-        return;
-      }
-      const rec = getRecommendation(data);
-      const dew = calculateDewPoint(data.main.temp - 273.15, data.main.humidity).toFixed(1);
-      const details = `(RH: ${data.main.humidity}%, Dew Point: ${dew}°C, Wind: ${(data.wind.speed*3.6).toFixed(1)} km/h)`;
-      recDiv.textContent = rec + ' ' + details;
-    })
-    .catch(err => {
-      recDiv.textContent = 'Error fetching weather: ' + err.message;
-    });
-}
-
-
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
-        err => recDiv.textContent = 'Geolocation error: ' + err.message
-      );
-    } else {
-      recDiv.textContent = 'Geolocation not supported by your browser.';
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          setTimeout(() => {
+            loadingSpinner.style.display = 'none';  // Hide spinner after fetch
+            if (!data.main || typeof data.main.humidity === 'undefined' || typeof data.main.temp === 'undefined') {
+              recDiv.textContent = 'Error: Incomplete weather data received.';
+              return;
+            }
+            if (!data.wind || typeof data.wind.speed === 'undefined') {
+              recDiv.textContent = 'Error: Incomplete weather data received.';
+              return;
+            }
+            const { rec, class: recClass } = getRecommendation(data);
+            const dew = calculateDewPoint(data.main.temp - 273.15, data.main.humidity).toFixed(1);
+            const details = `(RH: ${data.main.humidity}%, Dew Point: ${dew}°C, Wind: ${(data.wind.speed * 3.6).toFixed(1)} km/h)`;
+            recDiv.textContent = rec + ' ' + details;
+            recDiv.className = recClass;
+            recDiv.style.opacity = 1; // Show result with smooth animation
+          }, 2000); // Delay of 2 seconds before showing result
+        })
+        .catch(err => {
+          recDiv.textContent = 'Error fetching weather: ' + err.message;
+          recDiv.className = 'red';
+        });
     }
+
+    function reloadWeather() {
+      loadingSpinner.style.display = 'block'; // Show spinner again
+      recDiv.style.opacity = 0;  // Hide result while loading
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+          err => {
+            recDiv.textContent = 'Geolocation error: ' + err.message;
+            loadingSpinner.style.display = 'none'; // Hide spinner on error
+          }
+        );
+      } else {
+        recDiv.textContent = 'Geolocation not supported by your browser.';
+        loadingSpinner.style.display = 'none'; // Hide spinner
+      }
+    }
+
+    reloadWeather(); // Call function on load
   </script>
 </body>
 </html>
