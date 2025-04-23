@@ -6,27 +6,25 @@
   <title>Cooler vs AC Recommendation</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
     body {
       font-family: 'Montserrat', sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 15px;
       background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       color: white;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
       text-align: center;
-      overflow: hidden;
-      position: relative;
+      min-height: 100vh;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     h1 {
       font-size: 3rem;
       font-weight: 600;
-      margin: 20px 0;
+      margin: 20px 0 10px;
       text-transform: uppercase;
       color: #fff;
       text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
@@ -36,7 +34,7 @@
 
     p {
       font-size: 1.3rem;
-      margin: 20px 0;
+      margin: 10px 0 20px;
       color: rgba(255, 255, 255, 0.8);
       animation: fadeIn 2.5s ease-in-out;
     }
@@ -45,11 +43,11 @@
       list-style: none;
       padding: 0;
       font-size: 1.2rem;
-      margin: 20px 0;
+      margin: 10px 0 30px;
     }
 
     li {
-      margin: 10px 0;
+      margin: 8px 0;
       animation: fadeIn 3s ease-in-out;
     }
 
@@ -60,33 +58,28 @@
       border-radius: 25px;
       margin-top: 30px;
       background: rgba(0, 0, 0, 0.7);
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
       opacity: 0;
       transition: opacity 1.5s ease-in-out;
     }
 
-    /* Green for Cooler */
     .green {
-      background-color: rgba(40, 167, 69, 0.8);
-      box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+      background-color: rgba(40, 167, 69, 0.9);
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.6);
       animation: excitement 2s ease-in-out forwards;
     }
 
-    /* Yellow for Marginal */
     .yellow {
-      background-color: rgba(255, 193, 7, 0.8);
-      box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+      background-color: rgba(255, 193, 7, 0.9);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
       animation: excitement 2s ease-in-out forwards;
     }
 
-    /* Red for AC */
     .red {
-      background-color: rgba(220, 53, 69, 0.8);
-      box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+      background-color: rgba(220, 53, 69, 0.9);
+      box-shadow: 0 0 15px rgba(220, 53, 69, 0.6);
       animation: sadness 2s ease-in-out forwards;
     }
 
-    /* Check loading spinner */
     .spinner {
       border: 5px solid #f3f3f3;
       border-top: 5px solid #3498db;
@@ -102,34 +95,16 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Excitement Animation (Green/Yellow) */
     @keyframes excitement {
-      0% {
-        transform: scale(0.9);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-        text-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.6);
-      }
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; text-shadow: 0 0 15px rgba(255, 255, 255, 0.7); }
     }
 
-    /* Sadness Animation (Red) */
     @keyframes sadness {
-      0% {
-        transform: scale(0.9);
-        opacity: 0;
-        filter: brightness(0.6);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-        filter: brightness(0.3);
-      }
+      0% { transform: scale(0.9); opacity: 0; filter: brightness(0.6); }
+      100% { transform: scale(1); opacity: 1; filter: brightness(0.3); }
     }
 
-    /* Fade-in effect */
     @keyframes fadeIn {
       0% { opacity: 0; }
       100% { opacity: 1; }
@@ -155,29 +130,37 @@
     }
 
     footer {
-      position: absolute;
-      bottom: 20px;
+      margin-top: auto;
+      padding: 20px;
       font-size: 0.9rem;
       color: white;
       opacity: 0.8;
     }
 
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; letter-spacing: 1px; }
+      p, ul, li { font-size: 1rem; margin: 10px 0; }
+      #recommendation { font-size: 1.2rem; padding: 12px 20px; }
+      .btn { font-size: 1.1rem; padding: 10px 20px; }
+      .spinner { width: 40px; height: 40px; border-width: 4px; }
+    }
   </style>
 </head>
 <body>
-  <h1 class="neon-text">Cooler vs AC Recommendation</h1>
-  <p>Let's find out whether you should use a cooler or an AC!</p>
+  <h1>Cooler vs AC</h1>
+  <p>Let’s find out what works best based on your weather!</p>
   <ul>
-    <li>Relative Humidity (RH)</li>
-    <li>Dew Point (°C) (Calculated)</li>
-    <li>Ambient Wind Speed (km/h)</li>
+    <li>✅ Relative Humidity</li>
+    <li>✅ Dew Point (°C)</li>
+    <li>✅ Wind Speed (km/h)</li>
   </ul>
+
   <div class="spinner" id="loadingSpinner"></div>
   <div id="recommendation">Fetching weather data…</div>
   <button class="btn" onclick="reloadWeather()">Check Again</button>
 
   <footer>
-    <p>Made with ❤️ by <strong>Mavthunder7</strong></p>
+    Made with ❤️ by <strong>Mavthunder7</strong>
   </footer>
 
   <script>
@@ -185,33 +168,27 @@
     const loadingSpinner = document.getElementById('loadingSpinner');
 
     function calculateDewPoint(tempC, humidity) {
-      const a = 17.27;
-      const b = 237.7;
+      const a = 17.27, b = 237.7;
       const alpha = ((a * tempC) / (b + tempC)) + Math.log(humidity / 100);
-      const dewPoint = (b * alpha) / (a - alpha);
-      return dewPoint;
+      return (b * alpha) / (a - alpha);
     }
 
     function getRecommendation(data) {
-      try {
-        const rh = data.main.humidity;
-        const tempC = data.main.temp - 273.15;
-        const windKmh = data.wind.speed * 3.6;
-        const dewC = calculateDewPoint(tempC, rh);
+      const rh = data.main.humidity;
+      const tempC = data.main.temp - 273.15;
+      const windKmh = data.wind.speed * 3.6;
+      const dewC = calculateDewPoint(tempC, rh);
 
-        const rhStatus = (rh <= 40) ? 'green' : (rh <= 70) ? 'yellow' : 'red';
-        const dewStatus = (dewC < 12.8) ? 'green' : (dewC < 15.6) ? 'yellow' : 'red';
-        const windStatus = (windKmh >= 7.2) ? 'green' : (windKmh >= 3.6) ? 'yellow' : 'red';
+      const rhStatus = rh <= 40 ? 'green' : rh <= 70 ? 'yellow' : 'red';
+      const dewStatus = dewC < 12.8 ? 'green' : dewC < 15.6 ? 'yellow' : 'red';
+      const windStatus = windKmh >= 7.2 ? 'green' : windKmh >= 3.6 ? 'yellow' : 'red';
 
-        if (rhStatus === 'green' && dewStatus === 'green' && windStatus === 'green') {
-          return { rec: '✅ Cooler will work fine', class: 'green' };
-        } else if (rhStatus === 'red' || dewStatus === 'red' || windStatus === 'red') {
-          return { rec: '❌ Use AC', class: 'red' };
-        } else {
-          return { rec: '⚠️ Performance marginal; consider AC', class: 'yellow' };
-        }
-      } catch (error) {
-        return { rec: 'Error processing weather data: ' + error.message, class: 'red' };
+      if (rhStatus === 'green' && dewStatus === 'green' && windStatus === 'green') {
+        return { rec: '✅ Cooler will work fine!', class: 'green' };
+      } else if (rhStatus === 'red' || dewStatus === 'red' || windStatus === 'red') {
+        return { rec: '❌ Use AC', class: 'red' };
+      } else {
+        return { rec: '⚠️ Marginal – Consider AC', class: 'yellow' };
       }
     }
 
@@ -223,22 +200,14 @@
         .then(res => res.json())
         .then(data => {
           setTimeout(() => {
-            loadingSpinner.style.display = 'none';  // Hide spinner after fetch
-            if (!data.main || typeof data.main.humidity === 'undefined' || typeof data.main.temp === 'undefined') {
-              recDiv.textContent = 'Error: Incomplete weather data received.';
-              return;
-            }
-            if (!data.wind || typeof data.wind.speed === 'undefined') {
-              recDiv.textContent = 'Error: Incomplete weather data received.';
-              return;
-            }
+            loadingSpinner.style.display = 'none';
             const { rec, class: recClass } = getRecommendation(data);
             const dew = calculateDewPoint(data.main.temp - 273.15, data.main.humidity).toFixed(1);
             const details = `(RH: ${data.main.humidity}%, Dew Point: ${dew}°C, Wind: ${(data.wind.speed * 3.6).toFixed(1)} km/h)`;
             recDiv.textContent = rec + ' ' + details;
             recDiv.className = recClass;
-            recDiv.style.opacity = 1; // Show result with smooth animation
-          }, 2000); // Delay of 2 seconds before showing result
+            recDiv.style.opacity = 1;
+          }, 2000);
         })
         .catch(err => {
           recDiv.textContent = 'Error fetching weather: ' + err.message;
@@ -247,23 +216,23 @@
     }
 
     function reloadWeather() {
-      loadingSpinner.style.display = 'block'; // Show spinner again
-      recDiv.style.opacity = 0;  // Hide result while loading
+      recDiv.style.opacity = 0;
+      loadingSpinner.style.display = 'block';
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
           err => {
+            loadingSpinner.style.display = 'none';
             recDiv.textContent = 'Geolocation error: ' + err.message;
-            loadingSpinner.style.display = 'none'; // Hide spinner on error
           }
         );
       } else {
-        recDiv.textContent = 'Geolocation not supported by your browser.';
-        loadingSpinner.style.display = 'none'; // Hide spinner
+        recDiv.textContent = 'Geolocation not supported.';
+        loadingSpinner.style.display = 'none';
       }
     }
 
-    reloadWeather(); // Call function on load
+    reloadWeather();
   </script>
 </body>
 </html>
