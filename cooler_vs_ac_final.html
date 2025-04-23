@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cooler vs AC Recommendation</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #recommendation { font-size: 1.2em; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Cooler vs AC Recommendation</h1>
+  <p>This page will auto-detect your location and check:</p>
+  <ul>
+    <li>Relative Humidity (RH)</li>
+    <li>Dew Point (°C) (Calculated)</li>
+    <li>Ambient Wind Speed (km/h)</li>
+  </ul>
+  <div id="recommendation">Fetching weather data…</div>
+
+  <script>
+    const recDiv = document.getElementById('recommendation');
+
+    function calculateDewPoint(tempC, humidity) {
+      const a = 17.27;
+      const b = 237.7;
+      const alpha = ((a * tempC) / (b + tempC)) + Math.log(humidity / 100);
+      const dewPoint = (b * alpha) / (a - alpha);
+      return dewPoint;
+    }
+
+    function getRecommendation(data) {
+      try {
+        const rh = data.main.humidity;
+        const tempC = data.main.temp - 273.15;
+        const windKmh = data.wind.speed * 3.6;
+        const dewC = calculateDewPoint(tempC, rh);
+
+        const rhStatus = (rh <= 40) ? 'green' : (rh <= 70) ? 'yellow' : 'red';
+        const dewStatus = (dewC < 12.8) ? 'green' : (dewC < 15.6) ? 'yellow' : 'red';
+        const windStatus = (windKmh >= 7.2) ? 'green' : (windKmh >= 3.6) ? 'yellow' : 'red';
+
+        if (rhStatus === 'green' && dewStatus === 'green' && windStatus === 'green') {
+          return '✅ Cooler will work fine';
+        } else if (rhStatus === 'red' || dewStatus === 'red' || windStatus === 'red') {
+          return '❌ Use AC';
+        } else {
+          return '⚠️ Performance marginal; consider AC';
+        }
+      } catch (error) {
+        return 'Error processing weather data: ' + error.message;
+      }
+    }
+
+    function fetchWeather(lat, lon) {
+  const apiKey = '0fd28e52215d8e37870957e8b3c313f1';
+  const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      console.log("Weather data received:", data); // 👈 Add this line
+      if (!data.main || typeof data.main.humidity === 'undefined' || typeof data.main.temp === 'undefined') {
+        recDiv.textContent = 'Error: Incomplete weather data received.';
+        return;
+      }
+      if (!data.wind || typeof data.wind.speed === 'undefined') {
+        recDiv.textContent = 'Error: Incomplete weather data received.';
+        return;
+      }
+      const rec = getRecommendation(data);
+      const dew = calculateDewPoint(data.main.temp - 273.15, data.main.humidity).toFixed(1);
+      const details = `(RH: ${data.main.humidity}%, Dew Point: ${dew}°C, Wind: ${(data.wind.speed*3.6).toFixed(1)} km/h)`;
+      recDiv.textContent = rec + ' ' + details;
+    })
+    .catch(err => {
+      recDiv.textContent = 'Error fetching weather: ' + err.message;
+    });
+}
+
+
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        err => recDiv.textContent = 'Geolocation error: ' + err.message
+      );
+    } else {
+      recDiv.textContent = 'Geolocation not supported by your browser.';
+    }
+  </script>
+</body>
+</html>
